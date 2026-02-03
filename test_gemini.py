@@ -1,16 +1,17 @@
 import os
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-model = genai.GenerativeModel('gemini-3-flash-preview')
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY"))
 
 with open("test_output.txt", "w") as f:
     try:
-        response = model.generate_content("Hello! Are you Gemini 3 Flash?")
+        response = client.models.generate_content(
+            model='gemini-3-flash-preview',
+            contents="Hello! Are you Gemini 3 Flash?"
+        )
         f.write(f"Response: {response.text}\n")
     except Exception as e:
         f.write(f"Error: {e}\n")

@@ -1,15 +1,25 @@
 import os
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
+# Global client variable to be initialized
+_client = None
+
+def get_client(api_key=None):
+    """Returns a GenAI client, initializing it if necessary."""
+    global _client
+    if _client is None or api_key:
+        key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if not key:
+            raise ValueError("API Key not found. Please set GEMINI_API_KEY or GOOGLE_API_KEY in .env or provide it directly.")
+        _client = genai.Client(api_key=key)
+    return _client
+
 def configure_gemini(api_key=None):
-    """Configures the Gemini API with the provided key or from environment variables."""
-    key = api_key or os.getenv("GEMINI_API_KEY")
-    if not key:
-        raise ValueError("API Key not found. Please set GEMINI_API_KEY in .env or provide it directly.")
-    genai.configure(api_key=key)
+    """Configures the Gemini API for legacy compatibility."""
+    get_client(api_key)
 
 def tailor_resume(resume_text, job_description):
     """
@@ -20,9 +30,9 @@ def tailor_resume(resume_text, job_description):
         job_description (str): The job description to target.
         
     Returns:
-        str: The tailored resume in Markdown.56
+        str: The tailored resume in Markdown.
     """
-    model = genai.GenerativeModel('gemini-3-flash-preview')
+    client = get_client()
     
     prompt = f"""
     You are an expert career coach and professional resume writer.
@@ -46,5 +56,8 @@ def tailor_resume(resume_text, job_description):
     Output the tailored resume in Markdown format. return ONLY the markdown code.
     """
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model='gemini-3-flash-preview',
+        contents=prompt
+    )
     return response.text
