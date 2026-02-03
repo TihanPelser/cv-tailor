@@ -35,3 +35,5 @@ uv run streamlit run app.py
 4.  Download the result!
 
 PS: A great tool to use to create a markdown CV is [Markdown Resume](https://github.com/junian/markdown-resume)
+
+TODO: Potentially add proper integrationm with Markdown Resume to avoid needing to copy back and forth between the two tools.
