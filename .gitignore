@@ -14,3 +14,4 @@ wheels/
 
 # Generated files
 models_output.txt
+user_profile.json
